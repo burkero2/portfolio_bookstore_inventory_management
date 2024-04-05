@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.book {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+table, form{
+    border:1px solid grey;
+    padding: 20px;
+}
+
+td {
+    padding: 2px 20px;
+}
+
