@@ -7,7 +7,150 @@ const books = [
     { id: 5, title: 'The Lord of the Rings', author: 'J.R.R. Tolkien', genre: 'Fantasy', year: 1954, stock: 3 }
   ];
 
+const genre = ["Fantasy", "Fiction", "Science-Fiction", "Dystopian"]
+
+
+
+
+// Function to add a New Item to the Book Object
+const newBookForm = document.getElementById("new-book-form");
+newBookForm.addEventListener("submit", addNewBook)
+
+function addNewBook(event){
+    event.preventDefault();
+    const form = event.target;
+    const title = form.bookTitle.value;
+    const author = form.bookAuthor.value;
+    const genre = form.bookGenre.value;
+    const year = form.bookYear.value;
+    const stock = parseInt(form.bookStock.value);
+    if (form){
+        const nextBookID = books[books.length-1].id+1;
+        console.log(nextBookID);
+        const newItem = { 
+            id: nextBookID, 
+            title: title, 
+            author: author, 
+            genre: genre, 
+            year: year, 
+            stock: stock 
+        }
+        books.push(newItem);
+    }
+    displayBooksList(books);
+    emptyFormData(form);
+    genreStockCount(books)
+}
+
+// Function to Filter the displayed booklist by Author
+const authorSearchBTn = document.getElementById("authorSearchBtn");
+authorSearchBTn.addEventListener("click", ()=>authorSearch(books))
+
+function authorSearch(books){
+    const author= document.getElementById("searchByAuthor").value;
+    const filteredAuthors = books.filter((book) => book.author ===author);
+    displayBooksList(filteredAuthors);
+}
+
+
+
+
+
+// Function to Filter the displayed booklist by Genre
+const genreFilter = document.getElementById("genre-filter-btn");
+genreFilter.addEventListener("click", () => filterByGenre(books))
+
+
+function filterByGenre(books){
+    const genre = document.getElementById("genreSelect").value;
+    if(genre==="All"){
+        displayBooksList(books);
+    }else{
+        const filteredBooks = books.filter((book) => book.genre ===genre);
+        displayBooksList(filteredBooks);
+    }  
+}
+
+
+
+// Function to Delete a book item from the book list
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.addEventListener("click", function(e) {
+        if(e.target.classList.contains("delete-book-btn")) {
+            deleteBookFunc(e);
+        }
+    });
+});
+
+function deleteBookFunc(e){
+    // Get the value of the bookId you are removing
+    const bookId = Number(e.target.value);
+    // Get the index value of that bookID
+    const bookIndex = books.findIndex(book => book.id === bookId);
+
+    const currentBookStock = books[bookIndex].stock;
+    if (bookIndex !== -1) { 
+        if(currentBookStock>1){
+            books[bookIndex].stock-=1;
+        } else{
+            books.splice(bookIndex, 1); 
+        }
+        displayBooksList(books);
+         
+    } else {
+        console.log("Book not found");
+    }
+    genreStockCount(books)
+}
+
+// Function to calculate stock by genre
+function genreStockCount(books){
+    const filterBookText = document.getElementById("filtered-books") 
+    const stockByGenre = books.reduce((acc, {genre, stock})=>{
+        if(!acc[genre]){
+            acc[genre]=0;
+        }
+        acc[genre]+=stock;
+        return acc;
+    }, {});
+    displayGenreStockCount(stockByGenre, filterBookText);
+};
+
+
+function displayGenreStockCount(stockByGenre, filterBookText){
+    let displayText = `<table>
+    <tr>
+        <th>Genre</th>
+        <th>Stock</th>
+    </tr>
+    `;
+    for (const genre in stockByGenre) {
+        if (stockByGenre.hasOwnProperty(genre)) {
+            displayText += `<tr><td>${genre}:</td><td>${stockByGenre[genre]}</td></tr>`;
+        }
+    }
+    const totalStocks = calculateTotalStock(books);
+    displayText += `<tr><td><strong>Total</strong></td><td><strong>${totalStocks}</strong></td></tr></table>`
+    filterBookText.innerHTML = displayText;
+}
+
+
+// Event Listener for the stock counts
+function calculateTotalStock(books){
+    displayBooksList(books);
+    const filterBtn = document.getElementById("genreSelect");
+    filterBtn.value = "All";
+    let total = books.reduce((acc, curr)=>{
+        return acc + curr.stock;
+    }, 0)
+    
+    return total;
+}
+
 // Function to display book list
+document.addEventListener("DOMContentLoaded", () => displayBooksList(books));
+document.addEventListener("DOMContentLoaded", () => genreStockCount(books));
+
 function displayBooksList(books){
     let booksHtml = `<table>
         <tr>
@@ -38,108 +181,15 @@ function displayBooksList(books){
 
     // Now, set the innerHTML of the container element to the booksHtml string
     document.getElementById("book-inventory").innerHTML = booksHtml;
-
+    
+    
 }
-
-document.addEventListener("DOMContentLoaded", () => displayBooksList(books));
-
 
 // Function to empty newBooks Form upon submission of data
 function emptyFormData(form){
     form.bookTitle.value = "";
     form.bookAuthor.value = "";
-    form.bookGenre.value = "";
-    form.bookYear.value = "";
-    form.bookStock.value = "";
+    form.bookGenre.value = "Fiction";
+    form.bookYear.value = "2024";
+    form.bookStock.value = "1";
 }
-
-
-// Function to add a New Item to the Book Object
-const newBookForm = document.getElementById("new-book-form");
-newBookForm.addEventListener("submit", addNewBook)
-
-function addNewBook(event){
-    event.preventDefault();
-    const form = event.target;
-    const title = form.bookTitle.value;
-    const author = form.bookAuthor.value;
-    const genre = form.bookGenre.value;
-    const year = form.bookYear.value;
-    const stock = parseInt(form.bookStock.value);
-    if (form){
-        const nextBookID = books.length+1;
-        console.log(nextBookID);
-        const newItem = { 
-            id: nextBookID, 
-            title: title, 
-            author: author, 
-            genre: genre, 
-            year: year, 
-            stock: stock 
-        }
-        books.push(newItem);
-    }
-    displayBooksList(books);
-    emptyFormData(form);
-}
-
-// Function to Filter the displayed booklist by Genre
-const genreFilter = document.getElementById("genre-filter-btn");
-
-console.log
-genreFilter.addEventListener("click", () => filterByGenre(books))
-
-
-function filterByGenre(books){
-    const genre = document.getElementById("genreSelect").value;
-    if(genre==="All"){
-        displayBooksList(books);
-    }else{
-        const filteredBooks = books.filter((book) => book.genre ===genre);
-        displayBooksList(filteredBooks);
-    }  
-}
-
-
-
-// Function to Delete a book item from the book list
-document.addEventListener("DOMContentLoaded", function() {
-    document.body.addEventListener("click", function(e) {
-        if(e.target.classList.contains("delete-book-btn")) {
-            deleteBookFunc(e);
-        }
-    });
-});
-
-function deleteBookFunc(e){
-// Chat GPT helped me build this function. 
-    const bookId = Number(e.target.value);
-    const bookIndex = books.findIndex(book => book.id === bookId);
-
-    if (bookIndex !== -1) { // Make sure the book was found
-        books.splice(bookIndex, 1); // Remove the book from the array
-        displayBooksList(books); // Refresh the display
-    } else {
-        console.log("Book not found");
-    }
-}
-
-// Stock Count Text Container Variable
-let stockCountContainer = document.getElementById("stock-count-container")
-
-// Event Listener for the stock counts
-const stockCounts = document.getElementById("stock-count-btn")
-stockCounts.addEventListener("click", () => calculateTotalStock(books)) 
-
-function calculateTotalStock(books){
-    displayBooksList(books);
-    const filterBtn = document.getElementById("genreSelect");
-    filterBtn.value = "All";
-    let total = books.reduce((acc, curr)=>{
-        return acc + curr.stock;
-    }, 0)
-    
-    stockCountContainer.innerHTML = total;
-}
-
-
