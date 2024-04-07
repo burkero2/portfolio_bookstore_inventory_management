@@ -1,20 +1,24 @@
 body {
     font-family: Arial, sans-serif;
+    width:80%;
+    margin: 0 auto;
+    /* background-color:lightgrey; */
 }
 
-.book {
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+h2{
+    margin:20px;
 }
 
-table, form{
-    border:1px solid grey;
-    padding: 20px;
+#searchFilterDiv{
+    float:left;
 }
 
-td {
-    padding: 2px 20px;
+#genreSelectDiv{
+    float:right;
 }
 
+
+#low-stock-list td:nth-child(4){
+    color:red;
+    font-weight:bold;
+}
